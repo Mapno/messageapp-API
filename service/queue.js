@@ -1,5 +1,6 @@
 const Bull = require('bull');
 const uuid = require('uuid');
+const saveMessage = require("./clients/saveMessage");
 
 const execute = require('./controllers/sendMessage');
 
@@ -7,8 +8,15 @@ const requestQueue = new Bull('request handling');
 
 const handleRequest = (req, res, next) => {
     const { destination, body } = req.body;
-    const messageId = uuid();
-    return requestQueue.add({ destination, body, messageId }).then(() => res.status(200).send(`You can check the message status with this id ${messageId}`))
+    const messageID = uuid();
+    return requestQueue
+        .add({ destination, body, messageID, status: "PENDING" })
+        .then(() => res.status(200).send(`You can check the message status with this id ${messageID}`))
+        .then(() => saveMessage({
+            ...req.body,
+            status: "PENDING",
+            messageID
+        }))
 }
 
 

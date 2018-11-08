@@ -9,6 +9,11 @@ module.exports = function(messageBody) {
 
   var query = getCredit();
 
+  saveMessage({
+    ...messageBody,
+    status: "OK"
+  });
+
   query.exec(function(err, credit) {
     if (err) return console.log(err);
 
@@ -38,10 +43,9 @@ module.exports = function(messageBody) {
             },
             function(_result, error) {
               if (error) {
-                // res.statusCode = 500;
-                // res.end(error);
+                console.log('Error 500.', error);
               } else {
-                // res.end(postRes.body);
+                console.log('Successfully saved');
               }
             }
           );
@@ -54,8 +58,7 @@ module.exports = function(messageBody) {
               status: "ERROR"
             },
             () => {
-              // res.statusCode = 500;
-              // res.end("Internal server error: SERVICE ERROR");
+              console.log('Error 500: Internal server error: SERVICE ERROR');
             }
           );
         }
@@ -73,8 +76,7 @@ module.exports = function(messageBody) {
             status: "TIMEOUT"
           },
           () => {
-            // res.statusCode = 500;
-            // res.end("Internal server error: TIMEOUT");
+            console.log('Error 500: Internal server error: TIMEOUT');
           }
         );
       });
@@ -84,8 +86,7 @@ module.exports = function(messageBody) {
       postReq.write(body);
       postReq.end();
     } else {
-      // res.statusCode = 500;
-      // res.end("No credit error");
+      console.log('Error 500: No credit error');
     }
   });
 };

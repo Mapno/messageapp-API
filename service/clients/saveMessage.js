@@ -28,6 +28,6 @@ module.exports = function(messageParams, cb) {
       }
     );
   } else {
-    cb();
+    saveMessageTransaction(messageParams, cb);
   }
 };

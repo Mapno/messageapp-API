@@ -18,7 +18,7 @@ let messageSchema = new mongoose.Schema({
     type: String,
     enum: ["ERROR", "OK", "TIMEOUT", "PENDING"]
   },
-  messageId: String
+  messageID: String
 });
 
 module.exports = (dbKey) => database.get(dbKey).model("Message", messageSchema);
