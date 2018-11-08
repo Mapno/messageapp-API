@@ -4,8 +4,8 @@ const getCredit = require("../clients/getCredit");
 
 const random = n => Math.floor(Math.random() * Math.floor(n));
 
-module.exports = function(req, res) {
-  const body = JSON.stringify(req.body);
+module.exports = function(messageBody) {
+  const body = JSON.stringify(messageBody);
 
   var query = getCredit();
 
@@ -16,8 +16,6 @@ module.exports = function(req, res) {
 
     if (current_credit > 0) {
       const postOptions = {
-        // host: "exercise4_messageapp_1",
-        // host: "messageapp",
         host: "localhost",
         port: 3000,
         path: "/message",
@@ -35,15 +33,15 @@ module.exports = function(req, res) {
         if (postRes.statusCode === 200) {
           saveMessage(
             {
-              ...req.body,
+              ...messageBody,
               status: "OK"
             },
             function(_result, error) {
               if (error) {
-                res.statusCode = 500;
-                res.end(error);
+                // res.statusCode = 500;
+                // res.end(error);
               } else {
-                res.end(postRes.body);
+                // res.end(postRes.body);
               }
             }
           );
@@ -52,12 +50,12 @@ module.exports = function(req, res) {
 
           saveMessage(
             {
-              ...req.body,
+              ...messageBodys,
               status: "ERROR"
             },
             () => {
-              res.statusCode = 500;
-              res.end("Internal server error: SERVICE ERROR");
+              // res.statusCode = 500;
+              // res.end("Internal server error: SERVICE ERROR");
             }
           );
         }
@@ -71,12 +69,12 @@ module.exports = function(req, res) {
 
         saveMessage(
           {
-            ...req.body,
+            ...messageBody,
             status: "TIMEOUT"
           },
           () => {
-            res.statusCode = 500;
-            res.end("Internal server error: TIMEOUT");
+            // res.statusCode = 500;
+            // res.end("Internal server error: TIMEOUT");
           }
         );
       });
@@ -86,8 +84,8 @@ module.exports = function(req, res) {
       postReq.write(body);
       postReq.end();
     } else {
-      res.statusCode = 500;
-      res.end("No credit error");
+      // res.statusCode = 500;
+      // res.end("No credit error");
     }
   });
 };

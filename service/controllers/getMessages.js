@@ -1,7 +1,8 @@
 const getMessages = require("../clients/getMessages");
 
-module.exports = function(req, res) {
-  getMessages().then(messages => {
-    res.json(messages);
-  });
+module.exports = (req, res) => {
+  return getMessages()
+    .then(messages => {
+      res.json(messages);
+    });
 };

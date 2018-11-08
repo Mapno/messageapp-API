@@ -1,4 +1,3 @@
-const http = require("http");
 const express = require("express");
 
 const bodyParser = require("body-parser");
@@ -50,11 +49,13 @@ const creditSchema = {
   }
 };
 
+const { handleRequest } = require('./queue');
+
 app.post(
   "/messages",
   bodyParser.json(),
   validate({ body: messageSchema }),
-  sendMessage
+  handleRequest
 );
 
 app.post(
@@ -63,6 +64,7 @@ app.post(
   validate({ body: creditSchema }),
   updateCredit
 );
+
 
 app.get("/messages", getMessages);
 
