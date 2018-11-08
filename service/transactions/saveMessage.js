@@ -1,6 +1,7 @@
 const database = require("../database/database");
 const Message = require("../models/message");
 const { cleanClone } = require("../utils/utils");
+const _ = require("lodash");
 
 function saveMessageReplica(replica, retries) {
 	if (retries > 0) {
@@ -26,28 +27,32 @@ function saveMessageTransaction(newValue) {
 	const { messageID, status } = newValue;
 	let message = new MessagePrimary(newValue);
 
-	return MessagePrimary.findOneAndUpdate({ messageID }, { status }, { new: true })
-		.then(existingMessage => {
-			if (existingMessage) {
-				MessageReplica.findOneAndUpdate({ messageID }, { status }, { new: true })
-			} else {
-				message
-					.save()
-					.then(doc => {
-						console.log("Message saved successfully:", doc);
-						return cleanClone(doc);
-					})
-					.then(clone => {
-						let replica = new MessageReplica(clone);
-						saveMessageReplica(replica, 3);
-						return clone;
-					})
-					.catch(err => {
-						console.log("Error while saving message", err);
-						throw err;
-					});
-			}
-		})
+	return MessagePrimary.findOneAndUpdate(
+		{ messageID },
+		{ status },
+		{ new: true }
+	).then(existingMessage => {
+		if (existingMessage != null) {
+			MessageReplica.findOneAndUpdate({ messageID }, { status }, { new: true })
+				.then(doc => console.log(doc))
+		} else {
+			message
+				.save()
+				.then(doc => {
+					console.log("Message saved successfully:", doc);
+					return cleanClone(doc);
+				})
+				.then(clone => {
+					let replica = new MessageReplica(clone);
+					saveMessageReplica(replica, 3);
+					return clone;
+				})
+				.catch(err => {
+					console.log("Error while saving message", err);
+					throw err;
+				});
+		}
+	});
 }
 
 module.exports = function (messageParams, cb) {
