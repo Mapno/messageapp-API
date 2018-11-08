@@ -1,5 +1,5 @@
 const Message = require("../models/message");
-const updateCreditTransaction = require("../transactions/updateCredit");
+const updateCreditTransaction = require("../../credit/transaction/updateCredit");
 const saveMessageTransaction = require("../transactions/saveMessage");
 
 module.exports = function (messageParams, cb) {

@@ -1,4 +1,4 @@
-const database = require("../database/database");
+const database = require("../database");
 const Credit = require("../models/credit");
 const { cleanClone } = require("../utils/utils");
 

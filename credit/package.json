@@ -1,7 +1,7 @@
 {
-  "name": "exercise5",
+  "name": "credit",
   "version": "1.0.0",
-  "description": "Message microservice",
+  "description": "Credit microservice",
   "repository": {
     "type": "git",
     "url": "git://github.com/cabify/backend-bootcamp.git"
@@ -13,13 +13,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bull": "^3.4.8",
     "express": "^4.16.4",
     "express-json-validator-middleware": "^1.2.3",
-    "mongodb": "^3.1.8",
-    "mongoose": "^5.3.4",
-    "nodemon": "^1.18.4",
-    "redis": "^2.8.0",
-    "uuid": "^3.3.2"
+    "mongodb": "^3.1.9",
+    "mongoose": "^5.3.10",
+    "redis": "^2.8.0"
   }
 }

@@ -7,10 +7,8 @@ const {
 } = require("express-json-validator-middleware");
 
 const getMessages = require("./controllers/getMessages");
-const updateCredit = require("./controllers/updateCredit");
-const getMessageByID = require('./controllers/getMessageByID');
-const { handleRequest } = require('./queue');
-
+const getMessageByID = require("./controllers/getMessageByID");
+const { handleRequest } = require("./queue");
 
 const app = express();
 
@@ -38,19 +36,6 @@ const messageSchema = {
   }
 };
 
-const creditSchema = {
-  type: "object",
-  required: ["amount"],
-  properties: {
-    location: {
-      type: "string"
-    },
-    amount: {
-      type: "number"
-    }
-  }
-};
-
 app.post(
   "/messages",
   bodyParser.json(),
@@ -58,20 +43,9 @@ app.post(
   handleRequest
 );
 
-app.post(
-  "/credit",
-  bodyParser.json(),
-  validate({ body: creditSchema }),
-  updateCredit
-);
-
-
 app.get("/messages", getMessages);
 
-app.get(
-  '/messages/:messageID/status',
-  getMessageByID
-);
+app.get("/messages/:messageID/status", getMessageByID);
 
 app.use(function(err, req, res, next) {
   console.log(res.body);
@@ -82,6 +56,6 @@ app.use(function(err, req, res, next) {
   }
 });
 
-app.listen(9005, function() {
+app.listen(9007, function() {
   console.log("App started on PORT 9005");
 });
