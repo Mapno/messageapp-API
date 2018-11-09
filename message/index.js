@@ -8,12 +8,15 @@ const {
 
 const getMessages = require("./controllers/getMessages");
 const getMessageByID = require("./controllers/getMessageByID");
-const { handleRequest } = require("./queue");
+const { checkCredit } = require("./queue");
 
 const app = express();
+const port = 9007
 
 const validator = new Validator({ allErrors: true });
 const { validate } = validator;
+
+require('./queue')
 
 const messageSchema = {
   type: "object",
@@ -40,7 +43,7 @@ app.post(
   "/messages",
   bodyParser.json(),
   validate({ body: messageSchema }),
-  handleRequest
+  checkCredit
 );
 
 app.get("/messages", getMessages);
@@ -48,7 +51,6 @@ app.get("/messages", getMessages);
 app.get("/messages/:messageID/status", getMessageByID);
 
 app.use(function(err, req, res, next) {
-  console.log(res.body);
   if (err instanceof ValidationError) {
     res.sendStatus(400);
   } else {
@@ -56,6 +58,6 @@ app.use(function(err, req, res, next) {
   }
 });
 
-app.listen(9007, function() {
-  console.log("App started on PORT 9005");
+app.listen(port, function() {
+  console.log(`App started on PORT ${port}`);
 });

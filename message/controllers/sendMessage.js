@@ -1,92 +1,85 @@
 const http = require("http");
 const saveMessage = require("../clients/saveMessage");
-const getCredit = require("../clients/getCredit");
 
 const random = n => Math.floor(Math.random() * Math.floor(n));
 
-module.exports = function(messageBody) {
-  const body = JSON.stringify(messageBody);
+module.exports = function (messageBody) {
 
-  var query = getCredit();
+	const promise1 = Promise.resolve(function () {
+		const message = messageBody.message;
+		delete message['status'];
+		const body = JSON.stringify(message);
 
-  saveMessage({
-    ...messageBody,
-    status: "OK"
-  });
+		const postOptions = {
+			host: "localhost",
+			port: 3000,
+			path: "/message",
+			method: "post",
+			json: true,
+			headers: {
+				"Content-Type": "application/json",
+				"Content-Length": Buffer.byteLength(body)
+			}
+		}
 
-  query.exec(function(err, credit) {
-    if (err) return console.log(err);
+		let postReq = http.request(postOptions);
+		return { postReq, message, body };
+	}());
 
-    current_credit = credit[0].amount;
+	promise1.then(data => {
+		const { postReq, message, body } = data
+		postReq.on("response", postRes => {
+			if (postRes.statusCode === 200) {
+				console.log({ ...message })
+				saveMessage(
+					{
+						...message,
+						status: "OK"
+					},
+					function (_result, error) {
+						if (error) {
+							console.log('Error 500.', error);
+						} else {
+							console.log('Successfully saved with status OK');
+						}
+					}
+				);
+			} else {
+				console.error("Error while sending message");
 
-    if (current_credit > 0) {
-      const postOptions = {
-        host: "localhost",
-        port: 3000,
-        path: "/message",
-        method: "post",
-        json: true,
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": Buffer.byteLength(body)
-        }
-      };
+				saveMessage(
+					{
+						...message,
+						status: "ERROR"
+					},
+					() => {
+						console.log('Error 500: Internal server error: SERVICE ERROR');
+					}
+				);
+			}
+		});
 
-      let postReq = http.request(postOptions);
+		postReq.setTimeout(random(6000));
 
-      postReq.on("response", postRes => {
-        if (postRes.statusCode === 200) {
-          saveMessage(
-            {
-              ...messageBody,
-              status: "OK"
-            },
-            function(_result, error) {
-              if (error) {
-                console.log('Error 500.', error);
-              } else {
-                console.log('Successfully saved');
-              }
-            }
-          );
-        } else {
-          console.error("Error while sending message");
+		postReq.on("timeout", () => {
+			console.error("Timeout Exceeded!");
+			postReq.abort();
 
-          saveMessage(
-            {
-              ...messageBodys,
-              status: "ERROR"
-            },
-            () => {
-              console.log('Error 500: Internal server error: SERVICE ERROR');
-            }
-          );
-        }
-      });
+			saveMessage(
+				{
+					...message,
+					status: "TIMEOUT"
+				},
+				() => {
+					console.log('Error 500: Internal server error: TIMEOUT');
+				}
+			);
+		});
 
-      postReq.setTimeout(random(6000));
+		postReq.on("error", () => { });
 
-      postReq.on("timeout", () => {
-        console.error("Timeout Exceeded!");
-        postReq.abort();
-
-        saveMessage(
-          {
-            ...messageBody,
-            status: "TIMEOUT"
-          },
-          () => {
-            console.log('Error 500: Internal server error: TIMEOUT');
-          }
-        );
-      });
-
-      postReq.on("error", () => {});
-
-      postReq.write(body);
-      postReq.end();
-    } else {
-      console.log('Error 500: No credit error');
-    }
-  });
+		postReq.write(body);
+		postReq.end();
+	})
+	.catch(error => console.log('Error: ', error))
 };

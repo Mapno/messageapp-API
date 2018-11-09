@@ -1,33 +1,18 @@
 const Message = require("../models/message");
-const updateCreditTransaction = require("../../credit/transaction/updateCredit");
 const saveMessageTransaction = require("../transactions/saveMessage");
+const { billMessage } = require('../queue');
 
 module.exports = function (messageParams, cb) {
-  const MessageModel = Message();
-  let message = new MessageModel(messageParams);
+	const MessageModel = Message();
+	let message = new MessageModel(messageParams);
+	const status = messageParams.status;
 
-  if (message.status == "OK") {
-    updateCreditTransaction(
-      {
-        amount: { $gte: 1 },
-        location: message.location.name
-      },
-      {
-        $inc: { amount: -message.location.cost }
-      },
-      function (doc, error) {
-        if (error) {
-          return cb(undefined, error);
-        } else if (doc == undefined) {
-          let error = "Not enough credit";
-          console.log(error);
-          cb(undefined, error);
-        } else {
-          saveMessageTransaction(messageParams, cb);
-        }
-      }
-    );
-  } else {
-    saveMessageTransaction(messageParams, cb);
-  }
+	console.log(`Message status: ${message.status}`)
+	console.log(`Message params: ${messageParams} %v`, messageParams)
+
+	if (status == "OK") {
+		saveMessageTransaction(messageParams, cb)
+	} else {
+		saveMessageTransaction(messageParams, cb)
+	}
 };

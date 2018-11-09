@@ -1,4 +1,4 @@
-const database = require("../database");
+const database = require('../database/database');
 const Credit = require("../models/credit");
 const { cleanClone } = require("../utils/utils");
 
@@ -22,14 +22,14 @@ function updateCreditTransaction(conditions, newValue) {
     })
     .then(() => {
       return updateCredit(CreditPrimary, conditions, newValue).then(doc => {
-        console.log("Credit updated successfully", doc);
+        console.log("Credit updated successfully");
         return doc;
       });
     })
     .then(cleanClone)
     .then(replica => {
       return updateCredit(CreditReplica, conditions, replica).then(doc => {
-        console.log("Credit replicated successfully", doc);
+        console.log("Credit replicated successfully");
         return doc;
       });
     })

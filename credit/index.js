@@ -7,11 +7,15 @@ const {
 } = require("express-json-validator-middleware");
 
 const updateCredit = require("./controllers/updateCredit");
+const getCredit = require('./controllers/getCredit');
 
 const app = express();
+const port = 9017;
 
 const validator = new Validator({ allErrors: true });
 const { validate } = validator;
+
+require('./queue');
 
 const creditSchema = {
     type: "object",
@@ -33,6 +37,11 @@ app.post(
     updateCredit
 );
 
+app.get(
+    "/credit",
+    getCredit
+);
+
 app.use(function (err, req, res, next) {
     console.log(res.body);
     if (err instanceof ValidationError) {
@@ -42,6 +51,6 @@ app.use(function (err, req, res, next) {
     }
 });
 
-app.listen(9017, function () {
-    console.log("App started on PORT 9005");
+app.listen(port, function () {
+    console.log(`App started on PORT ${port}`);
 });
