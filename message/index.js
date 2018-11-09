@@ -6,6 +6,8 @@ const {
   ValidationError
 } = require("express-json-validator-middleware");
 
+require('./queue');
+
 const getMessages = require("./controllers/getMessages");
 const getMessageByID = require("./controllers/getMessageByID");
 const { checkCredit } = require("./queue");
@@ -16,7 +18,6 @@ const port = 9007
 const validator = new Validator({ allErrors: true });
 const { validate } = validator;
 
-require('./queue')
 
 const messageSchema = {
   type: "object",

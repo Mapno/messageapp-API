@@ -76,10 +76,22 @@ module.exports = function (messageBody) {
 			);
 		});
 
-		postReq.on("error", () => { });
+		postReq.on("error", () => {
+			console.error("Error while sending message");
+
+			saveMessage(
+				{
+					...message,
+					status: "ERROR"
+				},
+				() => {
+					console.log('Error 500: Internal server error: SERVICE ERROR');
+				}
+			);
+		});
 
 		postReq.write(body);
 		postReq.end();
 	})
-	.catch(error => console.log('Error: ', error))
+		.catch(error => console.log('Error: ', error))
 };
