@@ -1,7 +1,7 @@
 const Bull = require('bull');
-const creditQueue = new Bull('credit-queue', 'redis://messageapp-api_redis_1:6379');
-const messageQueue = new Bull('message-queue', 'redis://messageapp-api_redis_1:6379');
-const rollbackQueue = new Bull('rollback-queue', 'redis://messageapp-api_redis_1:6379');
+const creditQueue = new Bull('credit-queue', 'redis://redis:6379');
+const messageQueue = new Bull('message-queue', 'redis://redis:6379');
+const rollbackQueue = new Bull('rollback-queue', 'redis://redis:6379');
 
 const uuid = require('uuid');
 
