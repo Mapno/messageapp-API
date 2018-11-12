@@ -13,7 +13,7 @@ const getMessageByID = require("./controllers/getMessageByID");
 const { checkCredit } = require("./queue");
 
 const app = express();
-const port = 9007
+const port = process.env.PORT;
 
 const validator = new Validator({ allErrors: true });
 const { validate } = validator;

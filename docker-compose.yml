@@ -1,6 +1,6 @@
 version: "3"
 services:
-  message:
+  message1:
     build: message/
     ports:
       - "9007:9007"
@@ -15,6 +15,25 @@ services:
       - mongodb_message
       - replica_message
       - redis
+    environment:
+      - PORT=9007
+  message2:
+    build: message/
+    ports:
+      - "9008:9008"
+    links:
+      - messageapp
+      - mongodb_message
+      - replica_message
+      - redis
+      - credit
+    depends_on:
+      - messageapp
+      - mongodb_message
+      - replica_message
+      - redis
+    environment:
+      - PORT=9008
   credit:
     build: credit/
     ports:
@@ -67,3 +86,13 @@ services:
     image: redis
     ports:
       - 6379:6379
+  haproxy:
+    image: haproxy:latest
+    depends_on:
+      - message1
+      - message2
+      - credit
+    ports:
+      - 80:80
+    volumes: 
+        - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro

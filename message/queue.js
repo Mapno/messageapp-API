@@ -10,7 +10,10 @@ const saveMessage = require('./transactions/saveMessage');
 
 const messagePrice = 1;
 
+const port = process.env.PORT;
+
 const checkCredit = (req, res, next) => {
+    console.log(`Went through port ${port}`);
     const { destination, body } = req.body;
     const messageID = uuid();
     return creditQueue
