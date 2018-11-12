@@ -1,0 +1,23 @@
+{
+  "name": "credit",
+  "version": "1.0.0",
+  "description": "Credit microservice",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cabify/backend-bootcamp.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bull": "^3.4.8",
+    "express": "^4.16.4",
+    "express-json-validator-middleware": "^1.2.3",
+    "mongodb": "^3.1.9",
+    "mongoose": "^5.3.10",
+    "redis": "^2.8.0"
+  }
+}
