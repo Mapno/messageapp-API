@@ -11,7 +11,7 @@ module.exports = function (messageBody) {
 		const body = JSON.stringify(message);
 
 		const postOptions = {
-			host: "localhost",
+			host: "messageapp",
 			port: 3000,
 			path: "/message",
 			method: "post",
