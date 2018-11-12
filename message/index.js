@@ -10,6 +10,7 @@ require('./queue');
 
 const getMessages = require("./controllers/getMessages");
 const getMessageByID = require("./controllers/getMessageByID");
+const checkHealth = require('./controllers/checkHealth');
 const { checkCredit } = require("./queue");
 
 const app = express();
@@ -17,7 +18,6 @@ const port = process.env.PORT;
 
 const validator = new Validator({ allErrors: true });
 const { validate } = validator;
-
 
 const messageSchema = {
   type: "object",
@@ -50,6 +50,8 @@ app.post(
 app.get("/messages", getMessages);
 
 app.get("/messages/:messageID/status", getMessageByID);
+
+app.get('/health', checkHealth);
 
 app.use(function(err, req, res, next) {
   if (err instanceof ValidationError) {

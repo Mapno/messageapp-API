@@ -34,7 +34,6 @@ creditQueue.process((job, done) => {
 
 rollbackQueue.process((job, done) => {
     const { cost } = job.data.message.location;
-    console.log('pasa', cost)
     getCredit()
         .then(function(credit) {
             let { amount } = credit[0];

@@ -34,6 +34,23 @@ services:
       - redis
     environment:
       - PORT=9008
+  message3:
+    build: message/
+    ports:
+      - "9009:9009"
+    links:
+      - messageapp
+      - mongodb_message
+      - replica_message
+      - redis
+      - credit
+    depends_on:
+      - messageapp
+      - mongodb_message
+      - replica_message
+      - redis
+    environment:
+      - PORT=9009
   credit:
     build: credit/
     ports:
