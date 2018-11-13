@@ -2,14 +2,13 @@ version: "3"
 services:
   service-v1:
     image: service-v1
-    ports:
-      - "9007:9007"
     links:
       - messageapp
       - mongodb_message
       - replica_message
       - redis
       - credit
+      - balancer
     depends_on:
       - messageapp
       - mongodb_message
@@ -18,17 +17,20 @@ services:
     environment:
       - PORT=9007
       - SERVICE_NAME=service-v1
+    deploy:
+      replicas: 5
+    expose:
+      - 9007
 
   service-v2:
     image: service-v2
-    ports:
-      - "9008:9008"
     links:
       - messageapp
       - mongodb_message
       - replica_message
       - redis
       - credit
+      - balancer
     depends_on:
       - messageapp
       - mongodb_message
@@ -37,6 +39,10 @@ services:
     environment:
       - PORT=9008
       - SERVICE_NAME=service-v2
+    deploy:
+      replicas: 1
+    expose:
+      - 9008
 
   credit:
     build: credit/
