@@ -53,6 +53,9 @@ app.get("/messages/:messageID/status", getMessageByID);
 
 app.get('/health', checkHealth);
 
+const version = process.env.SERVICE_NAME;
+// app.get('/version', (req, res) => res.status(200).send(version));
+
 app.use(function(err, req, res, next) {
   if (err instanceof ValidationError) {
     res.sendStatus(400);
