@@ -1,7 +1,7 @@
 version: "3"
 services:
   service-v1:
-    image: service-v1
+    image: mapno/service-v1
     links:
       - messageapp
       - mongodb_message
@@ -23,7 +23,7 @@ services:
       - 9007
 
   service-v2:
-    image: service-v2
+    image: mapno/service-v2
     links:
       - messageapp
       - mongodb_message
