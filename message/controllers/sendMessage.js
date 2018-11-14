@@ -1,8 +1,6 @@
 const http = require("http");
 const saveMessage = require("../clients/saveMessage");
 
-const random = n => Math.floor(Math.random() * Math.floor(n));
-
 module.exports = function (messageBody) {
 
 	const promise1 = Promise.resolve(function () {
@@ -59,7 +57,7 @@ module.exports = function (messageBody) {
 			}
 		});
 
-		postReq.setTimeout(random(6000));
+		postReq.setTimeout(1000);
 
 		postReq.on("timeout", () => {
 			console.error("Timeout Exceeded!");
