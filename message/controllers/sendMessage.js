@@ -3,6 +3,10 @@ const saveMessage = require("../clients/saveMessage");
 const braker = require('../braker');
 const util = require("util");
 
+braker.on("snapshot", snapshot => {
+	console.log(`Circuit open -> ${util.inspect(snapshot.open)}`);
+});
+
 module.exports = function (messageBody) {
 	const message = messageBody.message;
 	delete message["status"];
@@ -83,7 +87,4 @@ module.exports = function (messageBody) {
 		.catch(err => {
 			console.error(`${err}`);
 		});
-	braker.on("snapshot", snapshot => {
-		console.log(`Stats received -> ${util.inspect(snapshot)}`);
-	});
 };

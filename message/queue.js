@@ -2,6 +2,7 @@ const Bull = require('bull');
 const creditQueue = new Bull('credit-queue', 'redis://127.0.0.1:6379');
 const messageQueue = new Bull('message-queue', 'redis://127.0.0.1:6379');
 const rollbackQueue = new Bull('rollback-queue', 'redis://127.0.0.1:6379');
+const braker = require('./braker');
 
 const uuid = require('uuid');
 
@@ -12,11 +13,21 @@ const messagePrice = 1;
 
 const port = process.env.PORT;
 
+braker.isOpen() ? messageQueue.pause() : messageQueue.resume();
+
+braker.on('circuitOpen', () => messageQueue.pause())
+braker.on('circuitOpen', () => console.log('Circuit opened'))
+
+braker.on('circuitClosed', () => messageQueue.resume())
+braker.on('circuitClosed', () => console.log('Circuit closed'))
+
+
 const checkCredit = (req, res, next) => {
     const { destination, body } = req.body;
     const messageID = uuid();
     return creditQueue
         .add({ destination, body, messageID, status: "PENDING", location: { cost: messagePrice, name: 'Default' } })
+        .then(() => messageQueueJobCounter(messageQueue))
         .then(() => res.status(200).send(`You can check the message status with this id ${messageID}`))
         .then(() => saveMessage({
             ...req.body,
@@ -41,7 +52,7 @@ const rollbackCharge = message => {
 
 const handleCredit = data => {
     const { credit } = data;
-    if(typeof credit == 'number') {
+    if (typeof credit == 'number') {
         return sendMessage(data)
     } else {
         return console.log('Error: ', credit);
@@ -53,4 +64,11 @@ messageQueue.process(async (job, done) => {
         .then(() => done())
 });
 
-module.exports = { checkCredit, rollbackCharge };
+function messageQueueJobCounter(queue) {
+    return queue.count()
+        .then(jobs => console.log(`There are ${jobs} messages in queue`));
+}
+
+setInterval(() => messageQueueJobCounter(messageQueue), 2000)
+
+module.exports = { checkCredit, rollbackCharge, messageQueueJobCounter };
