@@ -4,7 +4,8 @@ const circuitBreakOptions = {
 	timeout: 1000,
 	threshold: 10,
 	waitThreshold: 2,
-	circuitDuration: 20000
+    circuitDuration: 20000,
+    statInterval: 5000
 };
 
 const braker = new CircuitBraker(circuitBreakOptions);
