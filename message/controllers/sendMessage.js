@@ -23,7 +23,6 @@ module.exports = function (messageBody) {
 	function asyncFunction(postOptions) {
 		return new Promise(function (resolve, reject) {
 			let postReq = http.request(postOptions, function (response) {
-				console.log(`status code: ${response.statusCode}`);
 				if (response.statusCode === 200) {
 					console.log({ ...message }),
 						saveMessage(
@@ -54,6 +53,21 @@ module.exports = function (messageBody) {
 					return reject(new Error("Error while sending message"));
 				}
 			});
+
+			postReq.setTimeout(1000)
+			postReq.on('timeout', () => {
+				saveMessage(
+					{
+						...message,
+						status: "TIMEOUT"
+					},
+					() => {
+						console.log('Error 500: Internal server error: TIMEOUT');
+					}
+				);
+				return reject(new Error('Timeout error'))
+			});
+
 
 			postReq.write(body);
 			postReq.end();
