@@ -1,0 +1,12 @@
+const CircuitBraker = require("brakes");
+
+const circuitBreakOptions = {
+	timeout: 1000,
+	threshold: 10,
+	waitThreshold: 2,
+	circuitDuration: 20000
+};
+
+const braker = new CircuitBraker(circuitBreakOptions);
+
+module.exports = braker;

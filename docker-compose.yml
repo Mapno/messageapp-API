@@ -1,23 +1,23 @@
 version: "3"
 services:
-  message:
-    image: mapno/service-v1
-    links:
-      - messageapp
-      - mongodb_message
-      - replica_message
-      - redis
-      - credit
-    depends_on:
-      - messageapp
-      - mongodb_message
-      - replica_message
-      - redis
-    environment:
-      - PORT=9007
-      - SERVICE_NAME=service-v1
-    ports:
-      - "9007:9007"
+  # message:
+  #   image: mapno/service-v1
+  #   links:
+  #     - messageapp
+  #     - mongodb_message
+  #     - replica_message
+  #     - redis
+  #     - credit
+  #   depends_on:
+  #     - messageapp
+  #     - mongodb_message
+  #     - replica_message
+  #     - redis
+  #   environment:
+  #     - PORT=9007
+  #     - SERVICE_NAME=service-v1
+  #   ports:
+  #     - "9007:9007"
 
   credit:
     build: credit/

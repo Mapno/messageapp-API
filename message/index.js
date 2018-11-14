@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require("express");
 
 const bodyParser = require("body-parser");
@@ -14,7 +15,7 @@ const checkHealth = require('./controllers/checkHealth');
 const { checkCredit } = require("./queue");
 
 const app = express();
-const port = process.env.PORT;
+const port = 9007;
 
 const validator = new Validator({ allErrors: true });
 const { validate } = validator;

@@ -1,7 +1,7 @@
 const Bull = require('bull');
-const creditQueue = new Bull('credit-queue', 'redis://redis:6379');
-const messageQueue = new Bull('message-queue', 'redis://redis:6379');
-const rollbackQueue = new Bull('rollback-queue', 'redis://redis:6379');
+const creditQueue = new Bull('credit-queue', 'redis://127.0.0.1:6379');
+const messageQueue = new Bull('message-queue', 'redis://127.0.0.1:6379');
+const rollbackQueue = new Bull('rollback-queue', 'redis://127.0.0.1:6379');
 
 const uuid = require('uuid');
 
@@ -13,12 +13,10 @@ const messagePrice = 1;
 const port = process.env.PORT;
 
 const checkCredit = (req, res, next) => {
-    console.log(`Went through port ${port}`);
     const { destination, body } = req.body;
     const messageID = uuid();
     return creditQueue
         .add({ destination, body, messageID, status: "PENDING", location: { cost: messagePrice, name: 'Default' } })
-        .then(() => countJobs(creditQueue))
         .then(() => res.status(200).send(`You can check the message status with this id ${messageID}`))
         .then(() => saveMessage({
             ...req.body,
@@ -33,11 +31,6 @@ const checkCredit = (req, res, next) => {
                 }
             })
         )
-}
-
-const countJobs = queue => {
-    return queue.count()
-        .then(numberOfJobs => console.log(`There are this many jobs in queue: ${numberOfJobs}`))
 }
 
 const rollbackCharge = message => {

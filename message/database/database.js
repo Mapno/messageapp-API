@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const servers = {
-  primary: "mongodb_message:27027",
-  replica: "replica_message:27028"
-  // primary: "127.0.0.1:27027",
-  // replica: "127.0.0.1:27028"
+  // primary: "mongodb_message:27027",
+  // replica: "replica_message:27028"
+  primary: "127.0.0.1:27027",
+  replica: "127.0.0.1:27028"
 };
 const database = "message";
 
@@ -54,8 +54,8 @@ module.exports = {
       conn = connections.find(connection => connection.isPrimary == false);
     }
     if (conn) {
-      console.log("Requested connection:", dbKey);
-      console.log("Found:", conn.name);
+      // console.log("Requested connection:", dbKey);
+      // console.log("Found:", conn.name);
     }
     debugger;
     return conn.conn;
