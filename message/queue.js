@@ -3,6 +3,7 @@ const creditQueue = new Bull('credit-queue', 'redis://127.0.0.1:6379');
 const messageQueue = new Bull('message-queue', 'redis://127.0.0.1:6379');
 const rollbackQueue = new Bull('rollback-queue', 'redis://127.0.0.1:6379');
 const braker = require('./braker');
+const logger = require('./logger');
 
 let messageQueueSaturated = false;
 
@@ -18,10 +19,16 @@ const port = process.env.PORT;
 braker.isOpen() ? messageQueue.pause() : messageQueue.resume();
 
 braker.on('circuitOpen', () => messageQueue.pause());
-braker.on('circuitOpen', () => console.log('Circuit opened'));
+braker.on('circuitOpen', () => logger.info({
+    message: 'Circuit opened',
+    label: 'Message service'
+}));
 
 braker.on('circuitClosed', () => messageQueue.resume());
-braker.on('circuitClosed', () => console.log('Circuit closed'));
+braker.on('circuitClosed', () => logger.info({
+    message: 'Circuit closed',
+    label: 'Message service'
+}));
 
 
 const checkCredit = (req, res, next) => {
@@ -57,9 +64,15 @@ const checkCredit = (req, res, next) => {
         },
             function (_result, error) {
                 if (error) {
-                    console.log('Error 500.', error);
+                    logger.error({
+                        message: 'Failed saving message',
+                        label: 'Message service'
+                    });
                 } else {
-                    console.log('Successfully saved');
+                    logger.info({
+                        message: 'Message successfully saved',
+                        label: 'Message service'
+                    })
                 }
             })
         )
@@ -68,7 +81,10 @@ const checkCredit = (req, res, next) => {
 const rollbackCharge = message => {
     return rollbackQueue
         .add({ message })
-        .then(() => console.log('Message delivery failed. Doing rollback of charge'))
+        .then(() => logger.error({
+            message: 'Message delivery failed. Doing rollback of charge',
+            label: 'Message app'
+        }))
 }
 
 const handleCredit = data => {
@@ -76,7 +92,11 @@ const handleCredit = data => {
     if (typeof credit == 'number') {
         return sendMessage(data)
     } else {
-        return console.log('Error: ', credit);
+        return logger.log({
+            message: error,
+            level: 'error',
+            label: 'Credit service'
+        });
     }
 }
 
@@ -87,9 +107,12 @@ messageQueue.process(async (job, done) => {
 
 function messageQueueJobCounter(queue) {
     return queue.count()
-        .then(jobs => console.log(`There are ${jobs} messages in queue`));
+        .then(jobs => logger.debug({
+            message: `There are ${jobs} messages in queue`,
+            label: 'Message service'
+        }));
 }
 
-// setInterval(() => messageQueueJobCounter(messageQueue), 2000)
+setInterval(() => messageQueueJobCounter(messageQueue), 2000)
 
 module.exports = { checkCredit, rollbackCharge, messageQueueJobCounter };

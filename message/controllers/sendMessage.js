@@ -2,9 +2,13 @@ const http = require("http");
 const saveMessage = require("../clients/saveMessage");
 const braker = require('../braker');
 const util = require("util");
+const logger = require('../logger');
 
 braker.on("snapshot", snapshot => {
-	console.log(`Circuit open -> ${util.inspect(snapshot.open)}`);
+	logger.debug({
+		message: `Circuit open -> ${util.inspect(snapshot.open)}`,
+		label: 'Message service'
+	});
 });
 
 module.exports = function (messageBody) {
@@ -36,22 +40,34 @@ module.exports = function (messageBody) {
 							},
 							function (_result, error) {
 								if (error) {
-									console.log("Error 500.", error);
+									logger.error({
+										message: `Error 500: error`,
+										label: 'Message service'
+									});
 								} else {
-									console.log("Successfully saved with status OK");
+									logger.info({
+										message: "Successfully saved with status OK",
+										label: 'Message service'
+									});
 								}
 							}
 						);
 					return resolve(message);
 				} else if (response.statusCode >= 500) {
-					console.error("Error while sending message"),
+					logger.error({
+						message: "Error while sending message",
+						label: 'Database'
+					}),
 						saveMessage(
 							{
 								...message,
 								status: "ERROR"
 							},
 							() => {
-								console.log("Error 500: Internal server error: SERVICE ERROR");
+								logger.error({
+									message: "Error 500: Internal server error: SERVICE ERROR",
+									label: 'Message app'
+								});
 							}
 						);
 					return reject(new Error("Error while sending message"));
@@ -66,7 +82,10 @@ module.exports = function (messageBody) {
 						status: "TIMEOUT"
 					},
 					() => {
-						console.log('Error 500: Internal server error: TIMEOUT');
+						logger.error({
+							message: 'Error 500: Internal server error: TIMEOUT',
+							label: 'Message app'
+						});
 					}
 				);
 				return reject(new Error('Timeout error'))
@@ -82,9 +101,15 @@ module.exports = function (messageBody) {
 	circuit
 		.exec(postOptions)
 		.then(result => {
-			console.log(`result: ${result}`);
+			logger.info({
+				message: `result: ${result}`,
+				label: 'Message service'
+			});
 		})
 		.catch(err => {
-			console.error(`${err}`);
+			logger.error({
+				message: `${err}`,
+				label: 'Message service'
+			});
 		});
 };

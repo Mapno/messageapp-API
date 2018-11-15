@@ -5,7 +5,7 @@ const circuitBreakOptions = {
 	threshold: 10,
 	waitThreshold: 2,
     circuitDuration: 20000,
-    // statInterval: 2000
+    statInterval: 2000
 };
 
 const braker = new CircuitBraker(circuitBreakOptions);

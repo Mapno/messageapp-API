@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const logger = require('../logger')
 
 const servers = {
   // primary: "mongodb_message:27027",
@@ -22,15 +23,20 @@ function createConnection(name, server, database) {
 
 function setupConnection(connection, backup) {
   connection.conn.on("disconnected", () => {
-    console.log("Node down:", connection.name);
-    connection.isActive = false;
+    logger.info({
+      message: `Node down: ${connection.name}`,
+      label: 'Database'
+    });    connection.isActive = false;
     if (connection.isPrimary) {
       connection.isPrimary = false;
       backup.isPrimary = backup.isActive;
     }
   });
   connection.conn.on("reconnected", () => {
-    console.log("Node up:", connection.name);
+    logger.info({
+      message: `Node up: ${connection.name}`,
+      label: 'Database'
+    });
     connection.isActive = true;
     connection.isPrimary = !backup.isPrimary;
   });
@@ -63,7 +69,10 @@ module.exports = {
 
   isReplicaOn: function() {
     replicaOn = connections[0].isActive && connections[1].isActive;
-    console.log(`Replica is ${replicaOn ? "ON" : "OFF"}`);
+    logger.warn({
+      message: `Replica is ${replicaOn ? "ON" : "OFF"}`,
+      label: 'Database'
+    });
     return replicaOn;
   }
 };

@@ -1,5 +1,6 @@
 require('dotenv').config()
 const express = require("express");
+const logger = require('./logger');
 
 const bodyParser = require("body-parser");
 const {
@@ -66,5 +67,9 @@ app.use(function(err, req, res, next) {
 });
 
 app.listen(port, function() {
-  console.log(`App started on PORT ${port}`);
+  logger.log({
+    message: `App started on PORT ${port}`,
+    label: 'Message service',
+    level: 'info'
+  });
 });
