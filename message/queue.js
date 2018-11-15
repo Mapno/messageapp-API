@@ -90,24 +90,6 @@ function messageQueueJobCounter(queue) {
         .then(jobs => console.log(`There are ${jobs} messages in queue`));
 }
 
-function isServiceSaturated() {
-    return messageQueue
-        .count()
-        .then(jobs => {
-            if(jobs <= 5) {
-                messageQueueSaturated = false;
-            }
-            if(jobs >= 10) {
-                messageQueueSaturated = true;
-            }
-        });
-};
-
-setInterval(() => {
-    isServiceSaturated()
-        .then()
-})
-
-setInterval(() => messageQueueJobCounter(messageQueue), 2000)
+// setInterval(() => messageQueueJobCounter(messageQueue), 2000)
 
 module.exports = { checkCredit, rollbackCharge, messageQueueJobCounter };
