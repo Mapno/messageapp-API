@@ -2,7 +2,7 @@ const CircuitBraker = require("brakes");
 
 const circuitBreakOptions = {
 	timeout: 1000,
-	threshold: 1,
+	threshold: 10,
 	waitThreshold: 2,
     circuitDuration: 20000,
     statInterval: 2000
