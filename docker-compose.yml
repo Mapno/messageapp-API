@@ -1,23 +1,23 @@
 version: "3"
 services:
-  # message:
-  #   image: mapno/service-v1
-  #   links:
-  #     - messageapp
-  #     - mongodb_message
-  #     - replica_message
-  #     - redis
-  #     - credit
-  #   depends_on:
-  #     - messageapp
-  #     - mongodb_message
-  #     - replica_message
-  #     - redis
-  #   environment:
-  #     - PORT=9007
-  #     - SERVICE_NAME=service-v1
-  #   ports:
-  #     - "9007:9007"
+  message:
+    image: message
+    links:
+      - messageapp
+      - mongodb_message
+      - replica_message
+      - redis
+      - credit
+    depends_on:
+      - messageapp
+      - mongodb_message
+      - replica_message
+      - redis
+    environment:
+      - PORT=9007
+      - SERVICE_NAME=service-v1
+    ports:
+      - "9007:9007"
 
   credit:
     build: credit/
@@ -72,3 +72,10 @@ services:
     image: redis
     ports:
       - 6379:6379
+
+  promehteus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml

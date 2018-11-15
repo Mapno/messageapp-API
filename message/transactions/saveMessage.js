@@ -1,7 +1,7 @@
 const database = require("../database/database");
 const Message = require("../models/message");
 const { cleanClone } = require("../utils/utils");
-const _ = require("lodash");
+const logger = require('../logger');
 
 function saveMessageReplica(replica, retries) {
 	if (retries > 0) {
@@ -9,7 +9,10 @@ function saveMessageReplica(replica, retries) {
 		return replica
 			.save()
 			.then(doc => {
-				console.log("Message replicated successfully");
+				logger.info({
+					message: "Message replicated successfully",
+					label: 'Message service'
+				});
 				return doc;
 			})
 			.catch(err => {

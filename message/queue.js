@@ -1,9 +1,10 @@
 const Bull = require('bull');
-const creditQueue = new Bull('credit-queue', 'redis://127.0.0.1:6379');
-const messageQueue = new Bull('message-queue', 'redis://127.0.0.1:6379');
-const rollbackQueue = new Bull('rollback-queue', 'redis://127.0.0.1:6379');
+const creditQueue = new Bull('credit-queue', 'redis://redis:6379');
+const messageQueue = new Bull('message-queue', 'redis://redis:6379');
+const rollbackQueue = new Bull('rollback-queue', 'redis://redis:6379');
 const braker = require('./braker');
 const logger = require('./logger');
+const numOfErrors = require('../prometheus').numOfErrors;
 
 let messageQueueSaturated = false;
 
@@ -53,9 +54,10 @@ const checkCredit = (req, res, next) => {
     })
         .then(saturated => {
             if(saturated)
-                res.status(200).send(`App is currently saturated. Try again later.`)
+                res.status(500).send(`App is currently saturated. Try again later.`)
             else
                 res.status(200).send(`You can check the message status with this id ${messageID}`)
+                numOfErrors.inc()
         })
         .then(() => saveMessage({
             ...req.body,
@@ -113,6 +115,6 @@ function messageQueueJobCounter(queue) {
         }));
 }
 
-setInterval(() => messageQueueJobCounter(messageQueue), 2000)
+// setInterval(() => messageQueueJobCounter(messageQueue), 2000)
 
 module.exports = { checkCredit, rollbackCharge, messageQueueJobCounter };

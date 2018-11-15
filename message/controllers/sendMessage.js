@@ -3,13 +3,14 @@ const saveMessage = require("../clients/saveMessage");
 const braker = require('../braker');
 const util = require("util");
 const logger = require('../logger');
+const numOfErrors = require('../prometheus').numOfErrors;
 
-braker.on("snapshot", snapshot => {
-	logger.debug({
-		message: `Circuit open -> ${util.inspect(snapshot.open)}`,
-		label: 'Message service'
-	});
-});
+// braker.on("snapshot", snapshot => {
+// 	logger.debug({
+// 		message: `Circuit open -> ${util.inspect(snapshot.open)}`,
+// 		label: 'Message service'
+// 	});
+// });
 
 module.exports = function (messageBody) {
 	const message = messageBody.message;
@@ -17,7 +18,7 @@ module.exports = function (messageBody) {
 	const body = JSON.stringify(message);
 
 	const postOptions = {
-		host: "localhost",
+		host: "messageapp",
 		port: 3000,
 		path: "/message",
 		method: "post",
@@ -54,6 +55,7 @@ module.exports = function (messageBody) {
 						);
 					return resolve(message);
 				} else if (response.statusCode >= 500) {
+					numOfErrors.inc();
 					logger.error({
 						message: "Error while sending message",
 						label: 'Database'
@@ -76,6 +78,7 @@ module.exports = function (messageBody) {
 
 			postReq.setTimeout(1000)
 			postReq.on('timeout', () => {
+				numOfErrors.inc()
 				saveMessage(
 					{
 						...message,
