@@ -4,7 +4,7 @@ const messageQueue = new Bull('message-queue', 'redis://redis:6379');
 const rollbackQueue = new Bull('rollback-queue', 'redis://redis:6379');
 const braker = require('./braker');
 const logger = require('./logger');
-const numOfErrors = require('../prometheus').numOfErrors;
+const numOfErrors = require('./prometheus').numOfErrors;
 
 let messageQueueSaturated = false;
 
